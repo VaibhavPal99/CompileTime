@@ -1,0 +1,120 @@
+/* home.css */
+
+/* Reset default margins and paddings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Basic body styling */
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+  }
+  
+  /* Main container styling */
+  .home-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px;
+  }
+  
+  /* Header section */
+  .home-header {
+    background: linear-gradient(135deg, #007bff, #6f42c1);
+    color: white;
+    padding: 100px 30px;
+    text-align: center;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    margin-bottom: 50px;
+  }
+  
+  .home-header .header-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .home-header h1 {
+    font-size: 3.5rem;
+    font-weight: bold;
+  }
+  
+  .home-header p {
+    font-size: 1.5rem;
+    margin-top: 20px;
+    margin-bottom: 40px;
+  }
+  
+  .cta-button {
+    font-size: 1.2rem;
+    padding: 12px 30px;
+    background-color: #fff;
+    color: #007bff;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .cta-button:hover {
+    background-color: #007bff;
+    color: white;
+    transform: scale(1.05);
+  }
+  
+  /* Features Section */
+  .features-section {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  
+  .features-section h2 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 40px;
+  }
+  
+  .features-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+  }
+  
+  .feature-card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .feature-card h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #007bff;
+  }
+  
+  .feature-card p {
+    font-size: 1.1rem;
+    color: #666;
+  }
+  
+  .feature-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-10px);
+  }
+  
+  /* Footer section */
+  .home-footer {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #777;
+    margin-top: 50px;
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+  }
+  

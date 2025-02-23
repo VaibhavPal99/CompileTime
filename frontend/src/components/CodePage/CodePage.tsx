@@ -17,7 +17,7 @@ export const CodePage = () => {
                 return;
             }
 
-            websocket.current = new WebSocket("ws://localhost:3000");
+            websocket.current = new WebSocket("ws://34.126.211.88:3000");
             const socket = websocket.current;
 
             socket.onopen = () => {
@@ -55,7 +55,7 @@ export const CodePage = () => {
     const submitJob = async () => {
         const jobId = uuidv4();
 
-        const res = await fetch(`http://localhost:3000/submit`, {
+        const res = await fetch(`http://34.126.211.88:3000/submit`, {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
