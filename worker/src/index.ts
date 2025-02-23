@@ -4,7 +4,8 @@ import path from 'path'
 import fs from "fs-extra"; 
 
 
-const client = createClient();
+const redisWorkerClient = createClient();
+const redisWorkerPublisher = createClient();
 
 const processSubmission = async (jobData : string) => {
 
@@ -54,7 +55,7 @@ const processSubmission = async (jobData : string) => {
         if(error){
             console.error(`Execution error: ${error.message}`);
 
-            await client.publish(
+            await redisWorkerPublisher.publish(
                 `job_result`, 
                 JSON.stringify({ jobId, error: error.message })
             );
@@ -62,7 +63,7 @@ const processSubmission = async (jobData : string) => {
         }else{
             const result = JSON.stringify({ jobId, userId, output: stdout, error: stderr });
 
-            await client.publish("job_result", result);
+            await redisWorkerPublisher.publish("job_result", result);
 
         }
 
@@ -77,13 +78,13 @@ async function startWorker(){
 
     try{
     
-        await client.connect();
+        await redisWorkerClient.connect();
 
         console.log("Worker Connected");
         while(true){
 
             try{
-                const jobData = await client.brPop("code_execution_jobs",0);
+                const jobData = await redisWorkerClient.brPop("code_execution_jobs",0);
 
                 if (!jobData) return;
                 await processSubmission(jobData.element);

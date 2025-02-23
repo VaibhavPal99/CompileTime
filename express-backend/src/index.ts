@@ -1,5 +1,7 @@
 import express from "express"
 import { createClient } from "redis";
+import { WebSocket as WS, WebSocketServer } from 'ws';
+import http, { IncomingMessage, ServerResponse } from "http";
 
 
 const app = express();
@@ -7,7 +9,8 @@ const PORT = 3000;
 app.use(express.json());
 
 
-const client = createClient();
+const redisPublisher = createClient();
+const redisSbuscriber = createClient();
 
 
 app.post("/submit", async (req,res) => {
@@ -16,11 +19,11 @@ app.post("/submit", async (req,res) => {
 
     try{
 
-        if (!client.isOpen) {
-            await client.connect();
+        if (!redisPublisher.isOpen) {
+            await redisPublisher.connect();
         }
 
-        await client.lPush("code_execution_jobs", JSON.stringify({jobId, userId, language, code, testCases}));
+        await redisPublisher.lPush("code_execution_jobs", JSON.stringify({jobId, userId, language, code, testCases}));
         res.json({
             msg : "Received Job"
         })
@@ -35,9 +38,29 @@ app.post("/submit", async (req,res) => {
 
 })
 
+const server = http.createServer(app);
+
+const wss = new WebSocketServer({server});
+
+wss.on('connection', (ws:WS) => {
+    
+    console.log("Client Connected!");
+    redisSbuscriber.subscribe("job_result", (message) => {
+
+        console.log("Sending to browser...");
+        ws.send(message);
+    })
+
+    ws.on('close',() => {
+        console.log("WebSocket client disconnected");
+    })
+
+})
+
+
 async function startServer() {
     try {
-        await client.connect();
+        await redisPublisher.connect();
         console.log("Connected to Redis");
 
         app.listen(3000, () => {
