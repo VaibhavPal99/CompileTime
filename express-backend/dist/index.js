@@ -21,12 +21,8 @@ const app = (0, express_1.default)();
 const PORT = 3000;
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({ origin: "http://localhost:5173", credentials: true }));
-const redisPublisher = (0, redis_1.createClient)({
-    socket: { host: process.env.REDIS_HOST || "localhost", port: parseInt(process.env.REDIS_PORT || "6379") }
-});
-const redisSubscriber = (0, redis_1.createClient)({
-    socket: { host: process.env.REDIS_HOST || "localhost", port: parseInt(process.env.REDIS_PORT || "6379") }
-});
+const redisPublisher = (0, redis_1.createClient)();
+const redisSubscriber = (0, redis_1.createClient)();
 const clients = new Map();
 function setupRedisSubscriber() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -97,7 +93,7 @@ function startServer() {
         try {
             yield redisPublisher.connect();
             console.log("Connected to Redis");
-            server.listen(3000, () => {
+            server.listen(3000, '0.0.0.0', () => {
                 console.log("Server is running on port 3000");
             });
         }
