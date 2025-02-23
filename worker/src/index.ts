@@ -57,12 +57,12 @@ const processSubmission = async (jobData : string) => {
 
             await redisWorkerPublisher.publish(
                 `job_result`, 
-                JSON.stringify({ jobId, error: error.message })
+                JSON.stringify({ jobId, userId, error: error.message })
             );
 
         }else{
             const result = JSON.stringify({ jobId, userId, output: stdout, error: stderr });
-
+            console.log(result);
             await redisWorkerPublisher.publish("job_result", result);
 
         }
@@ -79,6 +79,7 @@ async function startWorker(){
     try{
     
         await redisWorkerClient.connect();
+        await redisWorkerPublisher.connect();
 
         console.log("Worker Connected");
         while(true){
