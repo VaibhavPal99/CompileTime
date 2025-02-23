@@ -104,7 +104,7 @@ async function startServer() {
         await redisPublisher.connect();
         console.log("Connected to Redis");
 
-        server.listen(3000, () => {
+        server.listen(3000,'0.0.0.0', () => {
             console.log("Server is running on port 3000");
         });
     } catch (error) {

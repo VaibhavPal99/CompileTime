@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import './CodePage.css';
+import Editor from "@monaco-editor/react";
+import "./CodePage.css";
 
 export const CodePage = () => {
     const websocket = useRef<WebSocket | null>(null);
     const [code, setCode] = useState("");
     const [testCases, setTestCases] = useState("");
     const [output, setOutput] = useState("");
-    const [userId] = useState(() => uuidv4()); 
-
-    const language = "java";
+    const [userId] = useState(() => uuidv4());
+    const [language, setLanguage] = useState("cpp"); // Default language
 
     useEffect(() => {
         const connectWebSocket = () => {
             if (websocket.current && websocket.current.readyState !== WebSocket.CLOSED) {
-                return; // Avoid reconnecting if WebSocket is already open
+                return;
             }
 
             websocket.current = new WebSocket("ws://localhost:3000");
@@ -28,14 +28,10 @@ export const CodePage = () => {
             socket.onmessage = async (event) => {
                 try {
                     let textData = event.data instanceof Blob ? await event.data.text() : event.data;
-
                     const data = JSON.parse(textData);
-                    console.log("Error", data.error);
+
                     console.log("Received Data:", data);
-                    
-
                     setOutput(data.output || data.error || "No output received");
-
                 } catch (error) {
                     console.error("Error parsing WebSocket message:", error);
                 }
@@ -43,7 +39,7 @@ export const CodePage = () => {
 
             socket.onclose = () => {
                 console.log("WebSocket disconnected, attempting to reconnect...");
-                setTimeout(connectWebSocket, 1000); // Auto-reconnect after 1 second
+                setTimeout(connectWebSocket, 1000);
             };
 
             socket.onerror = (error) => {
@@ -52,10 +48,9 @@ export const CodePage = () => {
             };
         };
 
-        connectWebSocket(); // Initial WebSocket connection
-        return () => websocket.current?.close(); // Cleanup on unmount
-
-    }, []); // Ensures WebSocket only initializes once
+        connectWebSocket();
+        return () => websocket.current?.close();
+    }, []);
 
     const submitJob = async () => {
         const jobId = uuidv4();
@@ -76,11 +71,42 @@ export const CodePage = () => {
     };
 
     return (
-        <>
-            <textarea value={code} placeholder="Enter Code" onChange={(e) => setCode(e.target.value)}></textarea>
-            <textarea value={testCases} placeholder="Enter testcases" onChange={(e) => setTestCases(e.target.value)}></textarea>
-            <textarea placeholder="Output will be displayed here" value={output} readOnly></textarea>
-            <button onClick={submitJob}>Submit</button>
-        </>
+        <div className="code-container">
+            {/* Code Editor Section */}
+            <div className="editor-section">
+                <div className="toolbar">
+                    <select value={language} onChange={(e) => setLanguage(e.target.value)} className="language-selector">
+                        <option value="java">Java</option>
+                        <option value="python">Python</option>
+                        <option value="cpp">C++</option>
+                    </select>
+                    <button onClick={submitJob} className="submit-btn">Run Code</button>
+                </div>
+                <Editor
+                    height="88vh"
+                    width="100%"
+                    defaultLanguage="cpp"
+                    value={code}
+                    onChange={(value) => setCode(value || "")}
+                    theme="vs-dark"
+                />
+            </div>
+
+            {/* Input/Output Section */}
+            <div className="io-section">
+                <textarea 
+                    className="input-box"
+                    value={testCases} 
+                    placeholder="Enter test cases" 
+                    onChange={(e) => setTestCases(e.target.value)}
+                />
+                <textarea 
+                    className="output-box"
+                    placeholder="Output will be displayed here" 
+                    value={output} 
+                    readOnly
+                />
+            </div>
+        </div>
     );
 };

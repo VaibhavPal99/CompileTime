@@ -1,16 +1,100 @@
-textarea {
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+.code-container {
+    display: flex;
+    height: 100vh;
     width: 100%;
-    height: 150px;
+    background: linear-gradient(135deg, #1f1f1f, #252525);
     padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    resize: none;
+}
+
+/* Left: Editor Section */
+.editor-section {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 10px;
 }
 
-textarea:focus {
+.language-selector {
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+}
+
+.submit-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #007acc, #005fa3);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    font-weight: 600;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(135deg, #005fa3, #003f73);
+    transform: scale(1.05);
+}
+
+/* Right: Input/Output Section */
+.io-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    margin-left: 15px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Glassmorphism Effect */
+.input-box, .output-box {
+    flex: 1;
+    margin: 8px 0;
+    padding: 12px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    resize: none;
     outline: none;
-    border-color: #4CAF50;
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+}
+
+.input-box:focus, .output-box:focus {
+    border: 1px solid #007acc;
+    box-shadow: 0 4px 12px rgba(0, 122, 204, 0.5);
+}
+
+.input-box::placeholder, .output-box::placeholder {
+    color: rgba(255, 255, 255, 0.5);
 }
