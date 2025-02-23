@@ -57,7 +57,7 @@ app.post("/submit", async (req,res) => {
             await redisPublisher.connect();
         }
 
-        await redisPublisher.lPush("code_execution_jobs", JSON.stringify({jobId, userId, language, code, testCases}));
+        await redisPublisher.lPush(`${language}_execution_jobs`, JSON.stringify({jobId, userId, language, code, testCases}));
         res.json({
             msg : "Received Job",
             userId

@@ -9,7 +9,7 @@ export const CodePage = () => {
     const [output, setOutput] = useState("");
     const [userId] = useState(() => uuidv4()); 
 
-    const language = "cpp";
+    const language = "java";
 
     useEffect(() => {
         const connectWebSocket = () => {

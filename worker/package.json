@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:cpp": "node dist/worker_cpp.js",
+    "start:java": "node dist/worker_java.js",
+    "start:python": "node dist/worker_python.js",
+    "start:all": "concurrently \"node dist/worker_cpp.js\" \"node dist/worker_java.js\" \"node dist/worker_python.js\""
   },
   "keywords": [],
   "author": "",
@@ -12,6 +15,7 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.5",
+    "concurrently": "^9.1.2",
     "typescript": "^5.7.3"
   },
   "dependencies": {

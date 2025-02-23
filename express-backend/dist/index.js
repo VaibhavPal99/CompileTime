@@ -58,7 +58,7 @@ app.post("/submit", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (!redisPublisher.isOpen) {
             yield redisPublisher.connect();
         }
-        yield redisPublisher.lPush("code_execution_jobs", JSON.stringify({ jobId, userId, language, code, testCases }));
+        yield redisPublisher.lPush(`${language}_execution_jobs`, JSON.stringify({ jobId, userId, language, code, testCases }));
         res.json({
             msg: "Received Job",
             userId
