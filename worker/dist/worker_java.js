@@ -25,9 +25,15 @@ const processSubmission = (jobData) => __awaiter(void 0, void 0, void 0, functio
         console.log(`Unsupported language: ${language}`);
         return;
     }
+    const classRegex = /public\s+class\s+(\w+)/;
+    const match = code.match(classRegex);
+    let className = "Main"; // Default class name
+    if (match) {
+        className = match[1]; // Extracted class name
+    }
     const tmpDir = path_1.default.join(__dirname, "tmp", jobId);
     yield fs_extra_1.default.ensureDir(tmpDir);
-    const codeFile = path_1.default.join(tmpDir, "Main.java");
+    const codeFile = path_1.default.join(tmpDir, `${className}.java`);
     yield fs_extra_1.default.writeFile(codeFile, code);
     let inputFile = "";
     if (testCases) {
@@ -38,14 +44,14 @@ const processSubmission = (jobData) => __awaiter(void 0, void 0, void 0, functio
         docker run --rm \
         -v ${tmpDir}:/usr/src/app \
         --memory=256m --cpus="0.5" \
-        java_runner bash -c "javac Main.java && timeout 5s java Main"
+        java_runner bash -c "javac ${className}.java && timeout 5s java ${className}"
     `;
     if (testCases) {
         dockerCmd = `
             docker run --rm \
             -v ${tmpDir}:/usr/src/app \
             --memory=256m --cpus="0.5" \
-            java_runner bash -c "javac Main.java && timeout 2s java Main < input.txt"
+            java_runner bash -c "javac ${className}.java && timeout 2s java ${className} < input.txt"
         `;
     }
     (0, child_process_1.exec)(dockerCmd, (error, stdout, stderr) => __awaiter(void 0, void 0, void 0, function* () {

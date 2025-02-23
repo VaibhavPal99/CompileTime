@@ -16,10 +16,18 @@ const processSubmission = async (jobData : string) => {
         return;
     }
 
+    const classRegex = /public\s+class\s+(\w+)/;
+    const match = code.match(classRegex);
+
+    let className = "Main"; // Default class name
+    if (match) {
+        className = match[1]; // Extracted class name
+    }
+
     const tmpDir = path.join(__dirname, "tmp", jobId);
     await fs.ensureDir(tmpDir);
 
-    const codeFile = path.join(tmpDir, "Main.java");
+    const codeFile = path.join(tmpDir, `${className}.java`);
     await fs.writeFile(codeFile, code);
 
     let inputFile = "";
@@ -32,7 +40,7 @@ const processSubmission = async (jobData : string) => {
         docker run --rm \
         -v ${tmpDir}:/usr/src/app \
         --memory=256m --cpus="0.5" \
-        java_runner bash -c "javac Main.java && timeout 5s java Main"
+        java_runner bash -c "javac ${className}.java && timeout 5s java ${className}"
     `;
 
     if (testCases) {
@@ -40,7 +48,7 @@ const processSubmission = async (jobData : string) => {
             docker run --rm \
             -v ${tmpDir}:/usr/src/app \
             --memory=256m --cpus="0.5" \
-            java_runner bash -c "javac Main.java && timeout 2s java Main < input.txt"
+            java_runner bash -c "javac ${className}.java && timeout 2s java ${className} < input.txt"
         `;
     }
 
