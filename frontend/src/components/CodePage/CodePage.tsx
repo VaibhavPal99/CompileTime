@@ -10,6 +10,7 @@ export const CodePage = () => {
     const [output, setOutput] = useState("");
     const [userId] = useState(() => uuidv4());
     const [language, setLanguage] = useState("cpp"); // Default language
+    const [isLoading, setIsLoading] = useState(false); // Loading state
 
     useEffect(() => {
         const connectWebSocket = () => {
@@ -34,6 +35,8 @@ export const CodePage = () => {
                     setOutput(data.output || data.error || "No output received");
                 } catch (error) {
                     console.error("Error parsing WebSocket message:", error);
+                } finally {
+                    setIsLoading(false); // Stop loading when output is received
                 }
             };
 
@@ -53,21 +56,28 @@ export const CodePage = () => {
     }, []);
 
     const submitJob = async () => {
+        setIsLoading(true); // Start loading
+        setOutput(""); // Clear previous output
         const jobId = uuidv4();
 
-        const res = await fetch(`https://compiletime.site/submit`, {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ jobId, userId, language, code, testCases }),
-        });
+        try {
+            const res = await fetch(`https://compiletime.site/submit`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ jobId, userId, language, code, testCases }),
+            });
 
-        if (!res.ok) {
-            throw new Error("Failed to submit job");
+            if (!res.ok) {
+                throw new Error("Failed to submit job");
+            }
+
+            const data = await res.json();
+            console.log("Job submitted:", data);
+        } catch (error) {
+            console.error(error);
+            setIsLoading(false); // Stop loading on error
         }
-
-        const data = await res.json();
-        console.log("Job submitted:", data);
     };
 
     return (
@@ -80,7 +90,9 @@ export const CodePage = () => {
                         <option value="python">Python</option>
                         <option value="cpp">C++</option>
                     </select>
-                    <button onClick={submitJob} className="submit-btn">Run Code</button>
+                    <button onClick={submitJob} className="submit-btn" disabled={isLoading}>
+                        {isLoading ? "Running..." : "Run Code"}
+                    </button>
                 </div>
                 <Editor
                     height="88vh"
@@ -94,16 +106,19 @@ export const CodePage = () => {
 
             {/* Input/Output Section */}
             <div className="io-section">
+                {/* Input Box */}
                 <textarea 
                     className="input-box"
                     value={testCases} 
                     placeholder="Enter test cases" 
                     onChange={(e) => setTestCases(e.target.value)}
                 />
+                
+                {/* Output Box (Loading state inside it) */}
                 <textarea 
                     className="output-box"
                     placeholder="Output will be displayed here" 
-                    value={output} 
+                    value={isLoading ? "Processing..." : output} 
                     readOnly
                 />
             </div>
