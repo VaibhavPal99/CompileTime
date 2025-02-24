@@ -20,7 +20,7 @@ const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 const PORT = 3000;
 app.use(express_1.default.json());
-app.use((0, cors_1.default)({ origin: ["http://localhost:5173", "https://compile-time-eight.vercel.app"], credentials: true }));
+app.use((0, cors_1.default)({ origin: ["http://localhost:5173", "https://compile-time-beta.vercel.app"], credentials: true }));
 const redisPublisher = (0, redis_1.createClient)();
 const redisSubscriber = (0, redis_1.createClient)();
 const clients = new Map();
