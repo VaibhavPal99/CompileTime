@@ -42,14 +42,14 @@ const processSubmission = (jobData) => __awaiter(void 0, void 0, void 0, functio
         docker run --rm \
         -v ${tmpDir}:/usr/src/app \
         --memory=256m --cpus="0.5" \
-        cpp_runner bash -c "g++ tmp_${jobId}.cpp -o tmp_${jobId}.out && timeout 2s ./tmp_${jobId}.out"
+        cpp_runner bash -c "g++ -std=c++23 tmp_${jobId}.cpp -o tmp_${jobId}.out && timeout 2s ./tmp_${jobId}.out"
     `;
     if (testCases) {
         dockerCmd = `
             docker run --rm \
             -v ${tmpDir}:/usr/src/app \
             --memory=256m --cpus="0.5" \
-            cpp_runner bash -c "g++ tmp_${jobId}.cpp -o tmp_${jobId}.out && timeout 2s ./tmp_${jobId}.out < input.txt"
+            cpp_runner bash -c "g++ -std=c++23 tmp_${jobId}.cpp -o tmp_${jobId}.out && timeout 2s ./tmp_${jobId}.out < input.txt"
         `;
     }
     (0, child_process_1.exec)(dockerCmd, (error, stdout, stderr) => __awaiter(void 0, void 0, void 0, function* () {
