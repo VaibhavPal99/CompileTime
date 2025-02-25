@@ -8,9 +8,11 @@ export const CodePage = () => {
     const [code, setCode] = useState("");
     const [testCases, setTestCases] = useState("");
     const [output, setOutput] = useState("");
+    const [debugOutput, setDebugOutput] = useState("");
     const [userId] = useState(() => uuidv4());
     const [language, setLanguage] = useState("cpp"); // Default language
-    const [isLoading, setIsLoading] = useState(false); // Loading state
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState("output"); // State to switch between output.txt and debug.txt
 
     useEffect(() => {
         const connectWebSocket = () => {
@@ -32,11 +34,12 @@ export const CodePage = () => {
                     const data = JSON.parse(textData);
 
                     console.log("Received Data:", data);
-                    setOutput(data.output || data.error || "No output received");
+                    setOutput(data.output || "No output received");
+                    setDebugOutput(data.error || "No debug output received");
                 } catch (error) {
                     console.error("Error parsing WebSocket message:", error);
                 } finally {
-                    setIsLoading(false); // Stop loading when output is received
+                    setIsLoading(false);
                 }
             };
 
@@ -56,8 +59,9 @@ export const CodePage = () => {
     }, []);
 
     const submitJob = async () => {
-        setIsLoading(true); // Start loading
-        setOutput(""); // Clear previous output
+        setIsLoading(true);
+        setOutput("");
+        setDebugOutput("");
         const jobId = uuidv4();
 
         try {
@@ -76,7 +80,7 @@ export const CodePage = () => {
             console.log("Job submitted:", data);
         } catch (error) {
             console.error(error);
-            setIsLoading(false); // Stop loading on error
+            setIsLoading(false);
         }
     };
 
@@ -114,11 +118,27 @@ export const CodePage = () => {
                     onChange={(e) => setTestCases(e.target.value)}
                 />
                 
-                {/* Output Box (Loading state inside it) */}
+                {/* Toggle Buttons for Output Files */}
+                <div className="output-toggle">
+                    <button 
+                        className={selectedFile === "output" ? "active" : ""} 
+                        onClick={() => setSelectedFile("output")}
+                    >
+                        output.txt
+                    </button>
+                    <button 
+                        className={selectedFile === "debug" ? "active" : ""} 
+                        onClick={() => setSelectedFile("debug")}
+                    >
+                        debug.txt
+                    </button>
+                </div>
+
+                {/* Output Box */}
                 <textarea 
                     className="output-box"
                     placeholder="Output will be displayed here" 
-                    value={isLoading ? "Processing..." : output} 
+                    value={isLoading ? "Processing..." : selectedFile === "output" ? output : debugOutput} 
                     readOnly
                 />
             </div>
