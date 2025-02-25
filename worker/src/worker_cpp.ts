@@ -39,7 +39,7 @@ const processSubmission = async (jobData : string) => {
         docker run --rm \
         -v ${tmpDir}:/usr/src/app \
         --memory=256m --cpus="0.5" \
-        cpp_runner bash -c "g++ tmp_${jobId}.cpp -o tmp_${jobId}.out && timeout 2s ./tmp_${jobId}.out"
+        cpp_runner bash -c "g++ -std=c++23 tmp_${jobId}.cpp -o tmp_${jobId}.out && timeout 2s ./tmp_${jobId}.out"
     `;
 
     if(testCases){
@@ -47,7 +47,7 @@ const processSubmission = async (jobData : string) => {
             docker run --rm \
             -v ${tmpDir}:/usr/src/app \
             --memory=256m --cpus="0.5" \
-            cpp_runner bash -c "g++ tmp_${jobId}.cpp -o tmp_${jobId}.out && timeout 2s ./tmp_${jobId}.out < input.txt"
+            cpp_runner bash -c "g++ -std=c++23 tmp_${jobId}.cpp -o tmp_${jobId}.out && timeout 2s ./tmp_${jobId}.out < input.txt"
         `;
     }
 
