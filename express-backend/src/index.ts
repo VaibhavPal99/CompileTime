@@ -44,6 +44,9 @@ async function setupRedisSubscriber() {
 
 setupRedisSubscriber();
 
+app.get("/", (req, res) => {
+    res.status(200).json({ message: "Server is running!" });
+});
 
 app.post("/submit", async (req,res) => {
 

@@ -52,6 +52,9 @@ function setupRedisSubscriber() {
     });
 }
 setupRedisSubscriber();
+app.get("/", (req, res) => {
+    res.status(200).json({ message: "Server is running!" });
+});
 app.post("/submit", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { jobId, userId, code, language, testCases } = req.body;
     try {
