@@ -77,9 +77,11 @@ const server = http_1.default.createServer(app);
 const wss = new ws_1.WebSocketServer({ server });
 wss.on('connection', (ws) => {
     console.log("Client Connected!");
+    let userId = null;
     ws.on("message", (message) => {
         try {
-            const { userId } = JSON.parse(message.toString());
+            const data = JSON.parse(message.toString());
+            userId = data.userId;
             console.log("Printing UserId", userId);
             if (userId) {
                 clients.set(userId, ws); // Store WebSocket connection
@@ -88,6 +90,18 @@ wss.on('connection', (ws) => {
         }
         catch (error) {
             console.error("Invalid userId message", error);
+        }
+    });
+    ws.on("close", () => {
+        if (userId) {
+            clients.delete(userId); // ✅ Remove the user from the map
+            console.log(`User ${userId} disconnected and removed from clients map`);
+        }
+    });
+    ws.on("error", (err) => {
+        console.error("WebSocket error:", err);
+        if (userId) {
+            clients.delete(userId);
         }
     });
 });

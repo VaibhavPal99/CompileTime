@@ -84,10 +84,12 @@ wss.on('connection', (ws:WS) => {
     
     console.log("Client Connected!");
     
+    let userId: string | null = null;
 
     ws.on("message", (message) => {
         try {
-            const { userId } = JSON.parse(message.toString());
+            const data = JSON.parse(message.toString());
+            userId = data.userId;
             console.log("Printing UserId",userId);
 
             if (userId) {
@@ -98,6 +100,21 @@ wss.on('connection', (ws:WS) => {
             }
         } catch (error) {
             console.error("Invalid userId message", error);
+        }
+    });
+
+
+    ws.on("close", () => {
+        if (userId) {
+            clients.delete(userId); // ✅ Remove the user from the map
+            console.log(`User ${userId} disconnected and removed from clients map`);
+        }
+    });
+
+    ws.on("error", (err) => {
+        console.error("WebSocket error:", err);
+        if (userId) {
+            clients.delete(userId);
         }
     });
 
