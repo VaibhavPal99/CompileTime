@@ -91,6 +91,8 @@ wss.on('connection', (ws:WS) => {
             console.log("Printing UserId",userId);
 
             if (userId) {
+                
+                
                 clients.set(userId, ws); // Store WebSocket connection
                 console.log(`User ${userId} connected via WebSocket`);
             }
