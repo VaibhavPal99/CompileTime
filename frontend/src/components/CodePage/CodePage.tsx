@@ -22,7 +22,7 @@ export const CodePage = () => {
                 return;
             }
 
-            websocket.current = new WebSocket("ws://localhost:3000");
+            websocket.current = new WebSocket("wss://compiletime.site");
             const socket = websocket.current;
 
             socket.onopen = () => {
@@ -71,7 +71,7 @@ export const CodePage = () => {
         const jobId = uuidv4();
 
         try {
-            const res = await fetch(`http://localhost:3000/submit`, {
+            const res = await fetch(`https://compiletime.site/submit`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
