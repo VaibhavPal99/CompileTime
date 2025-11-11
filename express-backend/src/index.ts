@@ -106,7 +106,7 @@ wss.on('connection', (ws:WS) => {
 
     ws.on("close", () => {
         if (userId) {
-            clients.delete(userId); // ✅ Remove the user from the map
+            clients.delete(userId); //Remove the user from the map
             console.log(`User ${userId} disconnected and removed from clients map`);
         }
     });

@@ -1,64 +1,80 @@
-import { useEffect, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
 import "./CodePage.css";
+import NoteModal from "../Note/NoteModal";
 
 export const CodePage = () => {
-    const websocket = useRef<WebSocket | null>(null);
+    // const websocket = useRef<WebSocket | null>(null);
     const [code, setCode] = useState("");
     const [testCases, setTestCases] = useState("");
     const [output, setOutput] = useState("");
     const [debugOutput, setDebugOutput] = useState("");
-    const [userId] = useState(() => uuidv4());
-    const [language, setLanguage] = useState("cpp"); // Default language
+    // const [userId] = useState(() => uuidv4());
+    const [language, setLanguage] = useState<"java" | "python" | "cpp">("cpp"); // Default language
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState("output"); // State to switch between output.txt and debug.txt
-    const [theme, setTheme] = useState<"light" | "dark">("light");
+    const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+    const languageToId =  {
+        cpp: "54",
+        java: "91",
+        python: "113"
+    } as const;
+
+    function decodeBase64Utf8(str : string) {
+        if (!str) return "";
+        try {
+          return decodeURIComponent(escape(atob(str)));
+        } catch {
+          return atob(str); // fallback
+        }
+      }
+      
+
+    // useEffect(() => {
+    //     const connectWebSocket = () => {
+    //         if (websocket.current && websocket.current.readyState !== WebSocket.CLOSED) {
+    //             return;
+    //         }
+
+    //         websocket.current = new WebSocket("ws://localhost:3000");
+    //         const socket = websocket.current;
+
+    //         socket.onopen = () => {
+    //             console.log("WebSocket connected");
+    //             socket.send(JSON.stringify({ userId }));
+    //         };
+
+    //         socket.onmessage = async (event) => {
+    //             try {
+    //                 let textData = event.data instanceof Blob ? await event.data.text() : event.data;
+    //                 const data = JSON.parse(textData);
+
+    //                 console.log("Received Data:", data);
+    //                 setOutput(data.output || "No output received");
+    //                 setDebugOutput(data.error || "No debug output received");
+    //             } catch (error) {
+    //                 console.error("Error parsing WebSocket message:", error);
+    //             } finally {
+    //                 setIsLoading(false);
+    //             }
+    //         };
 
 
-    useEffect(() => {
-        const connectWebSocket = () => {
-            if (websocket.current && websocket.current.readyState !== WebSocket.CLOSED) {
-                return;
-            }
+    //         socket.onclose = () => {
+    //             console.log("WebSocket disconnected, attempting to reconnect...");
+    //             setTimeout(connectWebSocket, 1000);
+    //         };
 
-            websocket.current = new WebSocket("wss://compiletime.site");
-            const socket = websocket.current;
+    //         socket.onerror = (error) => {
+    //             console.error("WebSocket error:", error);
+    //             socket.close();
+    //         };
+    //     };
 
-            socket.onopen = () => {
-                console.log("WebSocket connected");
-                socket.send(JSON.stringify({ userId }));
-            };
-
-            socket.onmessage = async (event) => {
-                try {
-                    let textData = event.data instanceof Blob ? await event.data.text() : event.data;
-                    const data = JSON.parse(textData);
-
-                    console.log("Received Data:", data);
-                    setOutput(data.output || "No output received");
-                    setDebugOutput(data.error || "No debug output received");
-                } catch (error) {
-                    console.error("Error parsing WebSocket message:", error);
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-
-            socket.onclose = () => {
-                console.log("WebSocket disconnected, attempting to reconnect...");
-                setTimeout(connectWebSocket, 1000);
-            };
-
-            socket.onerror = (error) => {
-                console.error("WebSocket error:", error);
-                socket.close();
-            };
-        };
-
-        connectWebSocket();
-        return () => websocket.current?.close();
-    }, []);
+    //     connectWebSocket();
+    //     return () => websocket.current?.close();
+    // }, []);
 
     const toggleTheme = () => {
         setTheme((prev) => (prev === "light" ? "dark" : "light"));
@@ -68,36 +84,67 @@ export const CodePage = () => {
         setIsLoading(true);
         setOutput("");
         setDebugOutput("");
-        const jobId = uuidv4();
+        // const jobId = uuidv4();
+        const language_id = languageToId[language];
+        const source_code = btoa(code);
+        const stdin = btoa(testCases);
 
         try {
-            const res = await fetch(`https://compiletime.site/submit`, {
+            const submission = await fetch(`https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=false`, {
                 method: "POST",
                 credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ jobId, userId, language, code, testCases }),
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-rapidapi-host" : "judge0-ce.p.rapidapi.com",
+                    "x-rapidapi-key" : "f5201d6f35mshea9876fe947a54cp140f59jsncd4a4fb1d79f"
+                },
+                body: JSON.stringify({ language_id, source_code, stdin }),
             });
 
-            if (!res.ok) {
+            if (!submission.ok) {
                 throw new Error("Failed to submit job");
             }
 
-            const data = await res.json();
-            console.log("Job submitted:", data);
+            const { token } = await submission.json();
+            let result;
+            while(true){
+                const res = await fetch(`https://judge0-ce.p.rapidapi.com/submissions/${token}?base64_encoded=true&fields=*`, {
+                    headers : {
+                        "x-rapidapi-host" : "judge0-ce.p.rapidapi.com",
+                        "x-rapidapi-key" : "f5201d6f35mshea9876fe947a54cp140f59jsncd4a4fb1d79f"
+                    }
+                });
+                result = await res.json();
+
+                if(result.status.id <= 2){
+                    await new Promise((resolve) => setTimeout(resolve, 1000))
+                }else{
+                    break;
+                }
+            }
+
+            setOutput(decodeBase64Utf8(result.stdout || ""));
+            setDebugOutput(decodeBase64Utf8(result.stderr || result.compile_output || ""));
+            setIsLoading(false);
+            // console.log("Job submitted:", data);
         } catch (error) {
             console.error(error);
             setIsLoading(false);
         }
+
+
+        
     };
 
     return (
         <div className={`code-container ${theme}`}>
+            <NoteModal/>
             {/* Top Toolbar */}
             <div className="editor-section">
                 <div className="toolbar">
                     <select
                         value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
+                        onChange={(e) => setLanguage(e.target.value as "java" | "python" | "cpp")}
                         className="language-selector"
                     >
                         <option value="java">Java</option>
@@ -163,9 +210,9 @@ export const CodePage = () => {
                         lineNumbers: "on",
                         scrollBeyondLastLine: false,
                         scrollbar: {
-                            vertical: "hidden",
-                            horizontal: "hidden",
-                            handleMouseWheel: false,
+                            vertical: "auto",
+                            horizontal: "auto",
+                            handleMouseWheel: true,
                         },
                         overviewRulerLanes: 0,
                     }}

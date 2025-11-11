@@ -16,10 +16,11 @@
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.5",
     "concurrently": "^9.1.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "fs-extra": "^11.3.0",
+    "ioredis": "^5.8.2",
     "redis": "^4.7.0"
   }
 }
